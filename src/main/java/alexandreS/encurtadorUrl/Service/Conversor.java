@@ -8,10 +8,13 @@ public class Conversor {
   private char[] baseCaracteres = baseLetras.toCharArray();
   private int baseNumerica = baseCaracteres.length;
 
+  private static final int TAMANHO_MAXIMO = 5;
+
   public String criptografa(long input) {
     StringBuilder criptografiaString = new StringBuilder();
-    if (input == 0) {
-      return String.valueOf(baseCaracteres[0]);
+ 
+    if (input < 0) {
+      throw new IllegalArgumentException("Erro no banco");
 
     }
     while (input > 0) {

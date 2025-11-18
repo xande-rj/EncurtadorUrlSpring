@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Encurtador - Enviar URL + Data</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f7fafc; color:#0f172a; padding:2rem; }
+    .card{ background:white; max-width:640px; margin:0 auto; padding:1.25rem; border-radius:8px; box-shadow:0 6px 18px rgba(2,6,23,0.08); }
+    label{ display:block; margin-top:0.75rem; font-weight:600; }
+    input[type="text"], input[type="url"]{ width:100%; padding:0.5rem; margin-top:0.35rem; border:1px solid #e6eef8; border-radius:6px; }
+    button{ margin-top:1rem; padding:0.6rem 1rem; border-radius:6px; border:0; background:#0ea5a4; color:white; cursor:pointer; font-weight:700; }
+    .info { margin-top:0.75rem; font-size:0.95rem; color:#334155; }
+    pre { background:#0b1220; color:#dbeafe; padding:0.75rem; border-radius:6px; overflow:auto; margin-top:1rem; }
+    .error { color:#b91c1c; font-weight:700; margin-top:0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Enviar URL + Data para API encurtadora</h1>
+
+    <form id="shortenForm">
+      <label for="url">URL a ser encurtada</label>
+      <input id="url" type="url" placeholder="https://exemplo.com/pagina" required />
+
+      <label for="date">Data / Expiração (formato exato)</label>
+      <input id="date" type="text" placeholder="2025-11-18T16:40:00.00" required />
+      <div class="info">
+        Use exatamente o formato: <code>YYYY-MM-DDTHH:MM:SS.SS</code> — exemplo: <code>2025-11-18T16:40:00.00</code>
+      </div>
+
+      <button type="submit">Enviar</button>
+
+      <div id="message" class="error" role="status" aria-live="polite"></div>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('shortenForm');
+    const apiEndpointInput = "http://localhost:8080/shorten-url";
+    const urlInput = document.getElementById('url');
+    const dateInput = document.getElementById('date');
+    const message = document.getElementById('message');
+    const result = document.getElementById('result');
+
+    // Regex que valida o formato solicitado: YYYY-MM-DDTHH:MM:SS.SS
+    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}$/;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      message.textContent = '';
+      result.innerHTML = '';
+
+      const endpoint = apiEndpointInput.trim();
+      const url = urlInput.value.trim();
+      const dateStr = dateInput.value.trim();
+      // valida URL
+      try {
+        // new URL() lança se inválida
+        new URL(url);
+      } catch (err) {
+        message.textContent = 'URL inválida. Use um formato como https://exemplo.com';
+        return;
+      }
+
+      // valida formato da data
+      if (!dateRegex.test(dateStr)) {
+        message.textContent = 'Data inválida. Use o formato YYYY-MM-DDTHH:MM:SS.SS — exemplo: 2025-11-18T16:40:00.00';
+        return;
+      }
+
+      // Monta o corpo JSON conforme solicitado
+      const body = {
+        longUrl: url,
+        dataExpiracao: dateStr  // envia exatamente no formato pedido
+      };
+
+      try {
+        const resp = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // caso sua API exija token, adicione: 'Authorization': 'Bearer SEU_TOKEN'
+          },
+          body: JSON.stringify(body)
+        });
+
+        const text = await resp.text(); // tenta ler como texto primeiro
+        let parsed;
+        try { parsed = JSON.parse(text); } catch (e) { parsed = text; }
+
+        // Exibe resultado
+        result.innerHTML = `
+          <strong>HTTP ${resp.status} ${resp.statusText}</strong>
+          <pre>${typeof parsed === 'string' ? escapeHtml(parsed) : JSON.stringify(parsed, null, 2)}</pre>
+        `;
+      } catch (err) {
+        message.textContent = 'Erro ao conectar com a API: ' + err.message;
+      }
+    });
+
+    // função de escape simples para exibir strings dentro do <pre>
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>
+
