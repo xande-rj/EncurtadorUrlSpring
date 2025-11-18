@@ -32,16 +32,22 @@ public class Conversor {
 
   public long decriptografia(String input) {
 
-    char[] caracteres = input.toCharArray();
-    int tamanho = caracteres.length;
+    if (input.length() < TAMANHO_MAXIMO) {
+      throw new IllegalArgumentException("Tamanho Incorreto");
+    }
 
+    char[] caracteres = input.toCharArray();
     long decriptografia = 0;
 
-    int contador = 1;
-    for (int i = 0; i < tamanho; i++) {
-      decriptografia += baseLetras.indexOf(caracteres[i]) * Math.pow(baseNumerica, tamanho - contador);
+    int contador = TAMANHO_MAXIMO - 1;
 
-      contador++;
+    for (char c : caracteres) {
+      int valor = baseLetras.indexOf(c);
+      if (valor == -1) {
+        throw new IllegalArgumentException("Caractere inválido: " + c);
+      }
+      decriptografia += valor * Math.pow(baseNumerica, contador);
+      contador--;
     }
 
     return decriptografia;
