@@ -1,5 +1,6 @@
 package alexandreS.encurtadorUrl.Entidade;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import lombok.*;
@@ -20,6 +21,6 @@ public class entidadeUrl {
   @Column(nullable = false)
   private Date dataCriacao;
   @Column(nullable = false)
-  private Date dataExpiracao;
+  private LocalDateTime dataExpiracao;
 
 }

@@ -29,7 +29,7 @@ public class urlControler {
 
   @PostMapping
   public String urlConvertida(@RequestBody urlDto Dto) {
-    return "localhost:8080/shorten-url/" + ServiceUrl.converterUrl(Dto);
+    return ServiceUrl.converterUrl(Dto);
   }
 
   @GetMapping("/{urlCurta}")

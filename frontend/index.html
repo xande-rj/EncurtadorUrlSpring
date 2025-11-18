@@ -13,6 +13,9 @@
     .info { margin-top:0.75rem; font-size:0.95rem; color:#334155; }
     pre { background:#0b1220; color:#dbeafe; padding:0.75rem; border-radius:6px; overflow:auto; margin-top:1rem; }
     .error { color:#b91c1c; font-weight:700; margin-top:0.5rem; }
+    .success { color:#15803d; font-weight:700; margin-top:0.5rem; }
+    .result-link { display:block; margin-top:1rem; padding:1rem; background:#f0f9ff; border:1px solid #bae6fd; border-radius:6px; text-decoration:none; color:#0369a1; }
+    .result-link:hover { background:#e0f2fe; }
   </style>
 </head>
 <body>
@@ -31,10 +34,10 @@
 
       <button type="submit">Enviar</button>
 
-      <div id="message" class="error" role="status" aria-live="polite"></div>
+      <div id="message" role="status" aria-live="polite"></div>
     </form>
 
-    <a href=""><div id="result"></div> </a>
+    <div id="result"></div>
   </div>
 
   <script>
@@ -51,65 +54,120 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       message.textContent = '';
+      message.className = '';
       result.innerHTML = '';
 
       const endpoint = apiEndpointInput.trim();
       const url = urlInput.value.trim();
       const dateStr = dateInput.value.trim();
+      
       // valida URL
       try {
-        // new URL() lança se inválida
         new URL(url);
       } catch (err) {
         message.textContent = 'URL inválida. Use um formato como https://exemplo.com';
+        message.className = 'error';
         return;
       }
 
       // valida formato da data
       if (!dateRegex.test(dateStr)) {
         message.textContent = 'Data inválida. Use o formato YYYY-MM-DDTHH:MM:SS.SS — exemplo: 2025-11-18T16:40:00.00';
+        message.className = 'error';
         return;
       }
 
       // Monta o corpo JSON conforme solicitado
       const body = {
         longUrl: url,
-        dataExpiracao: dateStr  // envia exatamente no formato pedido
+        dataExpiracao: dateStr
       };
 
       try {
+        message.textContent = 'Enviando...';
+        message.className = 'info';
+
         const resp = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // caso sua API exija token, adicione: 'Authorization': 'Bearer SEU_TOKEN'
           },
           body: JSON.stringify(body)
         });
 
-        const text = await resp.text(); // tenta ler como texto primeiro
+        const text = await resp.text();
         let parsed;
-        try { parsed = JSON.parse(text); } catch (e) { parsed = text; }
+        try { 
+          parsed = JSON.parse(text); 
+        } catch (e) { 
+          parsed = text; 
+        }
 
-        // Exibe resultado
-        result.innerHTML = `
-          <strong>HTTP ${resp.status} ${resp.statusText}</strong>
-          <br>
-          <a href=${typeof parsed === 'string' ? escapeHtml(parsed) : JSON.stringify(parsed, null, 2)} target="_blank">${escapeHtml(parsed)} </a>
-        `;
+        if (resp.ok) {
+          // A API deve retornar o código encurtado (5 caracteres)
+          const shortCode = typeof parsed === 'string' ? parsed : 
+                           parsed.shortUrl || parsed.code || parsed.id;
+          
+          if (shortCode) {
+            // Construir a URL completa do link encurtado
+            const baseUrl = 'localhost:8080/shorten-url';
+            // mesma base da sua API
+            const shortUrl = `${baseUrl}/${shortCode}`;
+            
+            message.textContent = 'URL encurtada criada com sucesso!';
+            message.className = 'success';
+            
+            result.innerHTML = `
+              <strong>URL Encurtada:</strong>
+              <a href="${shortUrl}" class="result-link" target="_blank">
+                ${shortUrl}
+              </a>
+              <div class="info">
+                Clique no link acima para testar o redirecionamento
+              </div>
+            `;
+          } else {
+            message.textContent = 'Resposta da API não contém código encurtado';
+            message.className = 'error';
+            result.innerHTML = `<pre>${escapeHtml(text)}</pre>`;
+          }
+        } else {
+          message.textContent = `Erro ${resp.status}: ${resp.statusText}`;
+          message.className = 'error';
+          result.innerHTML = `<pre>${escapeHtml(text)}</pre>`;
+        }
       } catch (err) {
         message.textContent = 'Erro ao conectar com a API: ' + err.message;
+        message.className = 'error';
       }
     });
 
+    // Função para preencher a data atual como exemplo
+    function fillCurrentDateExample() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+      dateInput.value = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.00`;
+    }
+
+    // Preencher exemplo de data ao carregar a página
+    window.addEventListener('load', fillCurrentDateExample);
+
     // função de escape simples para exibir strings dentro do <pre>
     function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
       return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
   </script>
 </body>
 </html>
-

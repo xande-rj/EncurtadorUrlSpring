@@ -1,5 +1,6 @@
 package alexandreS.encurtadorUrl.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class serviceUrl {
     entidadeUrl entidade = repositoriourl.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Sem entidade dessa url:" + urlCurta));
 
-    if (entidade.getDataExpiracao() != null && entidade.getDataExpiracao().before(new Date())) {
+    if (entidade.getDataExpiracao() != null && entidade.getDataExpiracao().isBefore(LocalDateTime.now())) {
       repositoriourl.delete(entidade);
       throw new EntityNotFoundException("url expirado");
     }
