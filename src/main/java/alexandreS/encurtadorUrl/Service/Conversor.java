@@ -12,20 +12,26 @@ public class Conversor {
 
   public String criptografa(long input) {
     StringBuilder criptografiaString = new StringBuilder();
- 
+
     if (input < 0) {
       throw new IllegalArgumentException("Erro no banco");
-
     }
+
     while (input > 0) {
 
       criptografiaString.append(baseCaracteres[(int) (input % baseNumerica)]);
       input = input / baseNumerica;
     }
+
+    while (criptografiaString.length() < TAMANHO_MAXIMO) {
+      criptografiaString.append('a');
+    }
+
     return criptografiaString.reverse().toString();
   }
 
   public long decriptografia(String input) {
+
     char[] caracteres = input.toCharArray();
     int tamanho = caracteres.length;
 
