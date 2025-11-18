@@ -34,7 +34,7 @@
       <div id="message" class="error" role="status" aria-live="polite"></div>
     </form>
 
-    <div id="result"></div>
+    <a href=""><div id="result"></div> </a>
   </div>
 
   <script>
@@ -94,7 +94,8 @@
         // Exibe resultado
         result.innerHTML = `
           <strong>HTTP ${resp.status} ${resp.statusText}</strong>
-          <pre>${typeof parsed === 'string' ? escapeHtml(parsed) : JSON.stringify(parsed, null, 2)}</pre>
+          <br>
+          <a href=${typeof parsed === 'string' ? escapeHtml(parsed) : JSON.stringify(parsed, null, 2)} target="_blank">${escapeHtml(parsed)} </a>
         `;
       } catch (err) {
         message.textContent = 'Erro ao conectar com a API: ' + err.message;
