@@ -68,10 +68,10 @@ Pontos de observacao :
 ***
 
 # Organizacao de pastas :
-`
- |front end <br>
- - | - index.html <br>
- |src<br>
+
+|front end <br>
+--| - index.html <br>
+|src<br>
 --|main<br>
 ---|java<br>
 ----|alexandreS<br>
@@ -86,7 +86,7 @@ Pontos de observacao :
 -----| - Service<br>
           |Conversor.java<br>
           |serviceUrl.java<br>
-`
+
 ***
 
 # Problemas 
