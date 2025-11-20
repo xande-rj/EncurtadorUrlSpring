@@ -67,5 +67,32 @@ Pontos de observacao :
 
 ***
 
+# Organizacao de pastas :
 
+|front end
+  | - index.html
+|src
+  |main
+    |java
+      |alexandreS
+        | - Crontoler
+          |urlControler.java
+        | - DTO
+          |urlDto.java
+        | - Entidade
+          |entidadeUrl.java
+        | - Repositorio
+          |repositorioUrl.java
+        | - Service
+          |Conversor.java
+          |serviceUrl.java
 
+***
+
+# Problemas 
+
+Alguns dos problemas que passei nesse projeto, foram o do Conversor de url e do Cors do front end.
+
+A parte principal do projeto e a conversor de uma url longa para curta a partir do id dele guardado no banco, e para ter os caracteres mínimos de 5 preenchi com letras "a", agora para decriptografar foi feito para retorna o id original guardado no banco e redirecionar o url original.
+
+Um outro problema foi a comunicacao com o front end e o back end, que tive problemas com cors, que utilizei a ia "deepseek" para a explicacao e entedimento de como posso ultrapassar esse problema, 
