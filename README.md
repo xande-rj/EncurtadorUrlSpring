@@ -68,25 +68,25 @@ Pontos de observacao :
 ***
 
 # Organizacao de pastas :
-
-|front end <br>
-  | - index.html <br>
-|src<br>
-  |main<br>
-    |java<br>
-      |alexandreS<br>
-        | - Crontoler<br>
+`
+ |front end <br>
+ - | - index.html <br>
+ |src<br>
+--|main<br>
+---|java<br>
+----|alexandreS<br>
+-----| - Crontoler<br>
           |urlControler.java<br>
-        | - DTO<br>
+-----| - DTO<br>
           |urlDto.java<br>
-        | - Entidade<br>
+-----| - Entidade<br>
           |entidadeUrl.java<br>
-        | - Repositorio<br>
+-----| - Repositorio<br>
           |repositorioUrl.java<br>
-        | - Service<br>
+-----| - Service<br>
           |Conversor.java<br>
           |serviceUrl.java<br>
-
+`
 ***
 
 # Problemas 
