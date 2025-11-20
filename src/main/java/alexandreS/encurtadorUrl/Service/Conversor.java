@@ -49,7 +49,6 @@ public class Conversor {
       decriptografia += valor * Math.pow(baseNumerica, contador);
       contador--;
     }
-
     return decriptografia;
   }
 }
